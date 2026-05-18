@@ -1,4 +1,4 @@
-const scriptURL = "Yhttps://script.google.com/macros/s/AKfycbzlJG7KN_V2JH2Aqka7Kt7fuVyq9LamAnTukhGC659NGTpNlJV1gUoi58duyzck8qI/exec";
+const scriptURL = "https://script.google.com/macros/s/AKfycbzlJG7KN_V2JH2Aqka7Kt7fuVyq9LamAnTukhGC659NGTpNlJV1gUoi58duyzck8qI/exec";
 
 function saveData() {
 
