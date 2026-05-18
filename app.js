@@ -1,47 +1,36 @@
-const scriptURL = "PASTE_YOUR_WEBAPP_URL_HERE";
-
 document.addEventListener("DOMContentLoaded", function () {
 
-    const form = document.getElementById("ppmp-form");
+    console.log("APP STARTED");
 
-    if (!form) {
-        console.error("ppmp-form not found. UI not loaded yet.");
+    const main = document.getElementById("main-content");
+
+    const loginTpl = document.getElementById("tpl-login");
+
+    if (!main || !loginTpl) {
+        console.error("Templates missing!");
         return;
     }
 
-    form.addEventListener("submit", async function (e) {
-        e.preventDefault();
+    // SHOW LOGIN SCREEN FIRST
+    main.innerHTML = loginTpl.innerHTML;
 
-        const data = {
-            items: document.getElementById("item-desc").value,
-            category: document.getElementById("item-category").value,
-            unit: document.getElementById("item-unit").value,
-            price: document.getElementById("item-price").value,
-            quantity: document.getElementById("item-qty").value,
-            StartDate: document.getElementById("item-start-date").value,
-            EndDate: document.getElementById("item-end-date").value,
-            DeliveryDate: document.getElementById("item-delivery-date").value
-        };
+    // LOGIN HANDLER
+    document.addEventListener("submit", function (e) {
 
-        try {
-            const response = await fetch(scriptURL, {
-                method: "POST",
-                body: JSON.stringify(data)
-            });
+        if (e.target && e.target.id === "login-form") {
+            e.preventDefault();
 
-            const result = await response.json();
+            console.log("LOGIN CLICKED");
 
-            if (result.success) {
-                alert("Saved to Google Sheet!");
-                form.reset();
-            } else {
-                alert("Failed to save.");
+            // TEMP: skip login and go to unit selector
+
+            const unitTpl = document.getElementById("tpl-unit-selector");
+
+            if (unitTpl) {
+                main.innerHTML = unitTpl.innerHTML;
             }
-
-        } catch (error) {
-            console.error(error);
-            alert("Error connecting to Google Sheets.");
         }
+
     });
 
 });
