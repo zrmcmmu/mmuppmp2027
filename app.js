@@ -1,3 +1,29 @@
+const scriptURL = "YOUR_WEBAPP_URL";
+
+function saveData() {
+
+  const data = {
+    name: document.getElementById("name").value,
+    amount: document.getElementById("amount").value
+  };
+
+  fetch(scriptURL, {
+    method: "POST",
+    body: JSON.stringify(data)
+  })
+  .then(response => response.json())
+  .then(data => {
+    alert("Saved Successfully");
+    console.log(data);
+  })
+  .catch(error => {
+    console.error(error);
+  });
+
+}
+
+
+
 // Constants
 const UNITS = [
     "Accounting", "AO Office", "Billing", "Billing & Claims", "Bucas", "Budget", 
