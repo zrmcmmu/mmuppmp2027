@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPMP Management System</title>
+    <meta name="description" content="Project Procurement Management Plan (PPMP) consolidation and entry system.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="app-container">
+        <header class="app-header">
+            <div class="header-logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                </div>
+                <h1>PPMP System</h1>
+            </div>
+            <nav class="app-nav" id="main-nav" style="display: none;">
+                <button id="nav-entry" class="nav-btn active">Unit Entry</button>
+                <button id="nav-consolidated" class="nav-btn">Consolidated View</button>
+                <div style="border-left: 1px solid #cbd5e1; margin: 0 0.5rem; height: 24px;"></div>
+                <button id="btn-backup" class="nav-btn" style="color: var(--primary-color);">Backup</button>
+                <button id="btn-restore" class="nav-btn" style="color: var(--secondary-color);">Restore</button>
+                <button id="btn-import-catalog" class="nav-btn" style="color: var(--success-color, #10b981);">Import Catalog</button>
+                <button id="btn-import-users" class="nav-btn" style="color: #f59e0b;">Import Users</button>
+                <button id="btn-logout" class="nav-btn" style="color: var(--danger-color, #ef4444); font-weight: bold;">Logout</button>
+            </nav>
+        </header>
+
+        <input type="file" id="file-restore" accept=".json" style="display: none;">
+        <input type="file" id="file-catalog" accept=".xlsx, .xls, .csv" style="display: none;">
+        <input type="file" id="file-users" accept=".xlsx, .xls, .csv" style="display: none;">
+
+        <main id="main-content">
+            <!-- Dynamic Content Renders Here -->
+        </main>
+    </div>
+
+    <!-- Templates for JavaScript to clone -->
+    <template id="tpl-login">
+        <div class="view-container slide-in" style="display: flex; justify-content: center; align-items: center; min-height: 60vh;">
+            <div class="glass-panel" style="width: 100%; max-width: 400px; padding: 2.5rem;">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div class="logo-icon" style="margin: 0 auto 1rem auto; width: 60px; height: 60px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 32px; height: 32px;">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <h2 style="font-size: 1.5rem; color: var(--text-main);">Welcome to PPMP</h2>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">Sign in with your email to continue</p>
+                </div>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="login-email">Email Address</label>
+                        <input type="email" id="login-email" class="premium-input" placeholder="e.g. user@gmail.com" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 2rem;">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" class="premium-input" placeholder="Enter your password" required>
+                    </div>
+                    <button type="submit" class="btn-primary" style="width: 100%;">Sign In</button>
+                </form>
+                <div style="margin-top: 1.5rem; text-align: center; font-size: 0.8rem; color: var(--text-muted);">
+                    Administrator: supply@mcsgh.com.ph
+                </div>
+            </div>
+        </div>
+    </template>
+    <template id="tpl-unit-selector">
+        <div class="view-container slide-in">
+            <div class="section-header">
+                <h2>Select Unit</h2>
+                <p>Choose your unit/department to input PPMP quantities.</p>
+            </div>
+            <div class="search-container">
+                <input type="text" id="unit-search" class="premium-input" placeholder="Search for your unit...">
+            </div>
+            <div id="unit-grid" class="unit-grid">
+                <!-- Unit cards inserted here -->
+            </div>
+        </div>
+    </template>
+
+    <template id="tpl-unit-entry">
+        <div class="view-container slide-in">
+            <div class="entry-header">
+                <button id="btn-back" class="btn-icon">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Back
+                </button>
+                <h2 id="current-unit-title">Unit Name</h2>
+            </div>
+
+            <div class="entry-layout">
+                <div class="form-panel glass-panel">
+                    <h3>Add Item</h3>
+                    <form id="ppmp-form">
+                        <div class="form-row-inline">
+                            <div class="form-group desc-group">
+                                <label for="item-desc">Item Description</label>
+                                <input type="text" id="item-desc" list="item-catalog" class="premium-input" required
+                                    placeholder="Select/type item...">
+                            </div>
+                            <div class="form-group">
+                                <label for="item-category">Category</label>
+                                <select id="item-category" class="premium-input" required>
+                                    <option value="" disabled selected>Select</option>
+                                    <option value="Office Supply">Office Supply</option>
+                                    <option value="Medical Supply">Medical Supply</option>
+                                    <option value="ICT Equipment">ICT Equipment</option>
+                                    <option value="Office Equipment">Office Equipment</option>
+                                    <option value="Medical Equipment">Medical Equipment</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="item-unit">Unit</label>
+                                <select id="item-unit" class="premium-input" required>
+                                    <option value="" disabled selected>Select</option>
+                                    <option value="ream">ream</option>
+                                    <option value="pack">pack</option>
+                                    <option value="piece">piece</option>
+                                    <option value="roll">roll</option>
+                                    <option value="bottle">bottle</option>
+                                    <option value="unit">unit</option>
+                                    <option value="set">set</option>
+                                    <option value="box">box</option>
+                                    <option value="pair">pair</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="item-price">Unit Price <span
+                                        style="font-size: 0.75rem; font-weight: normal;">(Opt)</span></label>
+                                <input type="number" id="item-price" class="premium-input" min="0" step="0.01"
+                                    placeholder="0.00">
+                            </div>
+                            <div class="form-group">
+                                <label for="item-qty">Qty</label>
+                                <input type="number" id="item-qty" class="premium-input" min="1" required
+                                    placeholder="1">
+                            </div>
+                        </div>
+                        <div class="form-row-inline">
+                            <div class="form-group">
+                                <label for="item-start-date">Start Date</label>
+                                <input type="date" id="item-start-date" class="premium-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="item-end-date">End Date</label>
+                                <input type="date" id="item-end-date" class="premium-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="item-delivery-date">Delivery</label>
+                                <input type="date" id="item-delivery-date" class="premium-input" required>
+                            </div>
+                            <div class="form-group" style="flex: 0 0 auto; display: flex; gap: 0.5rem;">
+                                <button type="submit" id="btn-submit-form" class="btn-primary">Add</button>
+                                <button type="button" id="btn-cancel-edit" class="btn-secondary"
+                                    style="display: none; padding: 0 1.5rem; border-radius: var(--border-radius-md); border: 1px solid #cbd5e1; background: #f1f5f9; cursor: pointer; height: 46px; font-weight: 600;">Cancel</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="list-panel glass-panel">
+                    <div class="panel-header">
+                        <h3>Requested Items</h3>
+                        <div style="display: flex; gap: 1rem; align-items: center;">
+                            <button id="btn-export-unit" class="btn-icon" style="background: white;">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                                Export CSV
+                            </button>
+                            <div class="total-badge">Total: Php <span id="unit-total-cost">0.00</span></div>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="premium-table">
+                            <thead>
+                                <tr>
+                                    <th>Description</th>
+                                    <th>Category</th>
+                                    <th>Procurement Dates</th>
+                                    <th>Delivery Date</th>
+                                    <th>Qty</th>
+                                    <th>Total Price</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="unit-items-body">
+                                <!-- Items inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="tpl-consolidated">
+        <div class="view-container slide-in">
+            <div class="section-header">
+                <h2>Consolidated PPMP</h2>
+                <p>Organization-wide procurement requirements.</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card glass-panel">
+                    <div class="stat-title">Total Items</div>
+                    <div class="stat-value" id="stat-total-items">0</div>
+                </div>
+                <div class="stat-card glass-panel">
+                    <div class="stat-title">Total Units Participated</div>
+                    <div class="stat-value" id="stat-total-units">0</div>
+                </div>
+                <div class="stat-card glass-panel highlight-card">
+                    <div class="stat-title">Estimated Total Budget</div>
+                    <div class="stat-value">Php <span id="stat-total-budget">0.00</span></div>
+                </div>
+            </div>
+
+            <div class="list-panel glass-panel mt-4">
+                <div class="panel-header" style="flex-wrap: wrap; gap: 1rem;">
+                    <h3>Consolidated Items</h3>
+                    
+                    <div class="controls-bar" style="display: flex; gap: 0.5rem; align-items: center; flex: 1; justify-content: flex-end;">
+                        <input type="text" id="filter-name" class="premium-input" placeholder="Search item name..." style="width: 200px; padding: 0.4rem 0.8rem;">
+                        <select id="filter-category" class="premium-input" style="width: auto; padding: 0.4rem 0.8rem;">
+                            <option value="All">All Categories</option>
+                            <option value="Office Supply">Office Supply</option>
+                            <option value="Medical Supply">Medical Supply</option>
+                            <option value="ICT Equipment">ICT Equipment</option>
+                            <option value="Office Equipment">Office Equipment</option>
+                            <option value="Medical Equipment">Medical Equipment</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <select id="sort-by" class="premium-input" style="width: auto; padding: 0.4rem 0.8rem;">
+                            <option value="category">Sort: Category</option>
+                            <option value="name">Sort: Item Name</option>
+                            <option value="cost_desc">Sort: Total Cost (High-Low)</option>
+                            <option value="cost_asc">Sort: Total Cost (Low-High)</option>
+                        </select>
+                        <button id="btn-export-consolidated" class="btn-primary"
+                            style="width: auto; padding: 0.4rem 0.8rem; display: flex; align-items: center; gap: 0.5rem; height: auto;">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Export CSV
+                        </button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="premium-table">
+                        <thead>
+                            <tr>
+                                <th>Item Description</th>
+                                <th>Category</th>
+                                <th>Procurement Dates</th>
+                                <th>Delivery Date</th>
+                                <th>Unit Price</th>
+                                <th>Total Qty</th>
+                                <th>Requested By</th>
+                                <th>Total Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody id="consolidated-items-body">
+                            <!-- Items inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <datalist id="item-catalog">
+        <!-- Dynamically populated from JS via Excel Import -->
+    </datalist>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
