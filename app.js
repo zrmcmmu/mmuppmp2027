@@ -1,3 +1,24 @@
+window.sendToGoogleSheet = async function (item) {
+    const scriptURL = "YOUR_WEBAPP_URL";
+
+    if (!scriptURL || scriptURL === "YOUR_WEBAPP_URL") {
+        console.warn("Google Sheet URL not set");
+        return;
+    }
+
+    try {
+        await fetch(scriptURL, {
+            method: "POST",
+            body: JSON.stringify(item)
+        });
+
+        console.log("Sent to Google Sheet");
+    } catch (err) {
+        console.error("Google Sheet error:", err);
+    }
+};
+
+
 const scriptURL = "YOUR_WEBAPP_URL";
 
 /* =========================
