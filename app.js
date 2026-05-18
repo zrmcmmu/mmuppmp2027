@@ -1,26 +1,35 @@
-const scriptURL = "https://script.google.com/macros/s/AKfycbzlJG7KN_V2JH2Aqka7Kt7fuVyq9LamAnTukhGC659NGTpNlJV1gUoi58duyzck8qI/exec";
+const scriptURL = "https://script.google.com/macros/s/AKfycbzb9LwR51zQ-IZVD-Mt1uaqjkn0XKs9UHselfuiA4SMJuvQhbk9fwR9sEVu7BQpR_U/exec";
 
-function saveData() {
+document.getElementById("myForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  const data = {
-    name: document.getElementById("name").value,
-    amount: document.getElementById("amount").value
-  };
+    const data = {
+        items: document.getElementById("items").value,
+        category: document.getElementById("category").value,
+         unit:document.getElementById("unit").value,
+         price:document.getElementById("price").value,
+         quantity:document.getElementById("quantity").value,
+         startdate:document.getElementById("StartDate").value,
+         enddate:document.getElementById("EndDate").value,
+         deliverydate:document.getElementById("DeliveryDate).value,
+        message: document.getElementById("message").value
+    };
 
-  fetch(scriptURL, {
-    method: "POST",
-    body: JSON.stringify(data)
-  })
-  .then(response => response.json())
-  .then(data => {
-    alert("Saved Successfully");
-    console.log(data);
-  })
-  .catch(error => {
-    console.error(error);
-  });
+    try {
+        const response = await fetch(scriptURL, {
+            method: "POST",
+            body: JSON.stringify(data)
+        });
 
-}
+        const result = await response.json();
+
+        alert("Saved to Google Sheet!");
+    } catch (error) {
+        console.error(error);
+        alert("Error saving data");
+    }
+});
+
 
 
 
